@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider, useMutation, useQuery, useQueryClient
 import { useState } from 'react';
 import type { ExpenseRepository } from './data/expenseRepository.js';
 import { toCsv } from './domain/csv.js';
-import type { NewExpense } from './domain/expense.js';
+import type { Expense, NewExpense } from './domain/expense.js';
 import { expensesInMonth } from './domain/summary.js';
 import { ExpenseForm } from './features/expenses/ExpenseForm.js';
 import { ExpenseList } from './features/expenses/ExpenseList.js';
@@ -32,35 +32,40 @@ function ExpenseScreen({ repository }: { repository: ExpenseRepository }) {
   const remove = useMutation({ mutationFn: (id: string) => repository.remove(id), onSuccess: refresh });
 
   const all = expenses.data ?? [];
-  const monthly = expensesInMonth(all, month);
 
   return (
-    <main className="page">
-      <header>
-        <h1>SpendVoice</h1>
-        <p className="muted">Your expenses stay on this device.</p>
+    <div className="app">
+      <header className="topbar">
+        <span className="brand">SpendVoice</span>
+        <span className="badge">On this device only</span>
       </header>
 
-      <ExpenseForm today={today} defaultCurrency={DEFAULT_CURRENCY} onSave={(expense) => add.mutateAsync(expense)} />
+      <main className="page">
+        <MonthSummary expenses={expensesInMonth(all, month)} currency={DEFAULT_CURRENCY} month={month} />
 
-      <MonthSummary expenses={monthly} currency={DEFAULT_CURRENCY} month={month} />
+        <ExpenseForm today={today} defaultCurrency={DEFAULT_CURRENCY} onSave={(expense) => add.mutateAsync(expense)} />
 
-      <section aria-labelledby="list-heading">
-        <div className="section-header">
-          <h2 id="list-heading">Recent expenses</h2>
-          <button type="button" className="secondary" disabled={all.length === 0} onClick={() => downloadCsv(all)}>
-            Export CSV
-          </button>
-        </div>
-        {expenses.isError ? <p role="alert" className="error">Your expenses could not be loaded.</p> : null}
-        {remove.isError ? <p role="alert" className="error">That expense could not be deleted.</p> : null}
-        <ExpenseList expenses={all} onDelete={(id) => remove.mutate(id)} />
-      </section>
-    </main>
+        <section className="card" aria-labelledby="list-heading">
+          <div className="section-header">
+            <h2 id="list-heading">Recent</h2>
+            <button type="button" className="secondary" disabled={all.length === 0} onClick={() => downloadCsv(all)}>
+              Export CSV
+            </button>
+          </div>
+          {expenses.isError ? <p role="alert" className="error">Your expenses could not be loaded.</p> : null}
+          {remove.isError ? <p role="alert" className="error">That expense could not be deleted.</p> : null}
+          <ExpenseList expenses={all} today={today} onDelete={(id) => remove.mutate(id)} />
+        </section>
+      </main>
+
+      <footer className="footer muted">
+        No account, no tracking. Your expenses are stored in this browser and work offline.
+      </footer>
+    </div>
   );
 }
 
-function downloadCsv(expenses: Parameters<typeof toCsv>[0]) {
+function downloadCsv(expenses: readonly Expense[]) {
   const url = URL.createObjectURL(new Blob([toCsv(expenses)], { type: 'text/csv' }));
   const link = document.createElement('a');
   link.href = url;

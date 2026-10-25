@@ -21,7 +21,8 @@ describe('SpendVoice app', () => {
 
     const list = await screen.findByRole('list', { name: 'Expenses' });
     expect(within(list).getByText('$12.00')).toBeInTheDocument();
-    expect(within(list).getByText(/transport/)).toBeInTheDocument();
+    expect(within(list).getByText('Transport')).toBeInTheDocument();
+    expect(within(list).getByText('Today')).toBeInTheDocument();
     expect(screen.getByText('$12.00', { selector: '.total' })).toBeInTheDocument();
   });
 

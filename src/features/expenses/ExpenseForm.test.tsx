@@ -15,7 +15,7 @@ describe('ExpenseForm', () => {
 
     await userEvent.type(input, 'coffee 4.50');
 
-    expect(screen.getByText('$4.50 · food · 2026-10-25')).toBeInTheDocument();
+    expect(screen.getByText('$4.50 · Food · 2026-10-25')).toBeInTheDocument();
     expect(save).toBeEnabled();
   });
 
@@ -40,6 +40,15 @@ describe('ExpenseForm', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('could not be saved');
     expect(input).toHaveValue('coffee 4.50');
+  });
+
+  it('fills the input from an example phrase', async () => {
+    const { input, save } = renderForm();
+    await userEvent.click(screen.getByRole('button', { name: 'taxi twelve dollars' }));
+
+    expect(input).toHaveValue('taxi twelve dollars');
+    expect(screen.getByText('$12.00 · Transport · 2026-10-25')).toBeInTheDocument();
+    expect(save).toBeEnabled();
   });
 
   it('does not offer voice input where the browser lacks it', () => {

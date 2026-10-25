@@ -1,11 +1,18 @@
 # SpendVoice
 
+[![CI](https://github.com/Ramvilla1997/spendvoice/actions/workflows/ci.yml/badge.svg)](https://github.com/Ramvilla1997/spendvoice/actions/workflows/ci.yml)
+
 Track expenses by speaking or typing. "Taxi twelve dollars" becomes a saved expense after you check the preview and press Save.
+
+**Live app:** https://ramvilla1997.github.io/spendvoice/
+
+<img src="docs/screenshot.png" alt="SpendVoice showing a monthly total of $94.49 with category bars, a microphone button, and expenses grouped by day" width="320" />
 
 - **Voice or text.** Speak where the browser supports it, or type. Nothing is saved until you confirm.
 - **Private by default.** Expenses are stored in your browser's IndexedDB. There are no accounts, no analytics, and no server.
 - **Works offline.** After the first visit, the app loads without a connection.
 - **Installable.** Add it to your home screen on Android, iPhone, or desktop. See [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md) for app stores.
+- **Monthly view.** A total for the month, a breakdown by category, and expenses grouped by day.
 - **Export.** Download every expense as a CSV file for a spreadsheet.
 
 ## Run it
@@ -15,7 +22,7 @@ Requires Node.js 20 or later.
 ```bash
 npm install
 npm run dev        # http://localhost:5173
-npm test           # 44 tests
+npm test           # 49 tests
 npm run build      # typecheck, then production build to dist/
 npm run preview    # serve the production build locally
 ```

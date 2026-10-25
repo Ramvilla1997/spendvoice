@@ -2,7 +2,11 @@ import { useState, type FormEvent } from 'react';
 import type { NewExpense } from '../../domain/expense.js';
 import { parseExpense } from '../../parsing/parseExpense.js';
 import { useSpeechRecognition } from '../../voice/useSpeechRecognition.js';
+import { CATEGORY_LABELS } from './categories.js';
 import { formatMoney } from './format.js';
+import { MicIcon } from './icons.js';
+
+const EXAMPLES = ['coffee 4.50', 'taxi twelve dollars', 'groceries 32 yesterday'];
 
 interface ExpenseFormProps {
   today: string;
@@ -17,6 +21,7 @@ export function ExpenseForm({ today, defaultCurrency, onSave }: ExpenseFormProps
   const speech = useSpeechRecognition({ lang: 'en-US', onResult: setText });
 
   const parsed = parseExpense(text, { today, defaultCurrency });
+  const isEmpty = text.trim() === '';
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -36,42 +41,52 @@ export function ExpenseForm({ today, defaultCurrency, onSave }: ExpenseFormProps
   }
 
   const preview = parsed.ok
-    ? `${formatMoney(parsed.expense.amountCents, parsed.expense.currency)} · ${parsed.expense.category} · ${parsed.expense.occurredOn}`
-    : text.trim() === '' ? 'Type or speak an expense.' : parsed.reason;
+    ? `${formatMoney(parsed.expense.amountCents, parsed.expense.currency)} · ${CATEGORY_LABELS[parsed.expense.category]} · ${parsed.expense.occurredOn}`
+    : isEmpty ? 'Say or type what you spent.' : parsed.reason;
 
   return (
-    <form className="expense-form" onSubmit={handleSubmit}>
-      <label htmlFor="expense-text">Describe the expense</label>
-      <div className="input-row">
-        <input
-          id="expense-text"
-          value={text}
-          onChange={(event) => setText(event.target.value)}
-          placeholder='For example "taxi twelve dollars"'
-          autoComplete="off"
-        />
-        {speech.supported ? (
-          <button
-            type="button"
-            className="secondary"
-            aria-pressed={speech.listening}
-            onClick={speech.listening ? speech.stop : speech.start}
-          >
-            {speech.listening ? 'Stop' : 'Speak'}
-          </button>
-        ) : null}
-      </div>
+    <form className="card capture" onSubmit={handleSubmit}>
+      {speech.supported ? (
+        <button
+          type="button"
+          className={`mic${speech.listening ? ' mic--listening' : ''}`}
+          aria-pressed={speech.listening}
+          aria-label={speech.listening ? 'Stop listening' : 'Speak an expense'}
+          onClick={speech.listening ? speech.stop : speech.start}
+        >
+          <MicIcon />
+        </button>
+      ) : null}
 
-      <p className="preview" aria-live="polite">{preview}</p>
+      <label htmlFor="expense-text" className="capture__label">
+        Describe the expense
+      </label>
+      <input
+        id="expense-text"
+        value={text}
+        onChange={(event) => setText(event.target.value)}
+        placeholder='"taxi twelve dollars"'
+        autoComplete="off"
+      />
+
+      <p className={`preview${parsed.ok ? ' preview--ok' : ''}`} aria-live="polite">{preview}</p>
+
+      {isEmpty ? (
+        <div className="examples" aria-label="Examples">
+          {EXAMPLES.map((example) => (
+            <button key={example} type="button" className="chip" onClick={() => setText(example)}>
+              {example}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
       {speech.error ? <p role="alert" className="error">{speech.error}</p> : null}
       {saveError ? <p role="alert" className="error">{saveError}</p> : null}
 
-      <button type="submit" disabled={!parsed.ok || saving}>
+      <button type="submit" className="primary" disabled={!parsed.ok || saving}>
         {saving ? 'Saving…' : 'Save expense'}
       </button>
-      <p className="muted">
-        Check the preview before saving. Some browsers send speech to their speech service to be converted to text.
-      </p>
     </form>
   );
 }
