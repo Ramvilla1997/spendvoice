@@ -13,6 +13,7 @@ Track expenses by speaking or typing. "Taxi twelve dollars" becomes a saved expe
 - **Works offline.** After the first visit, the app loads without a connection.
 - **Installable.** Add it to your home screen on Android, iPhone, or desktop. See [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md) for app stores.
 - **Monthly view.** A total for the month, a breakdown by category, and expenses grouped by day.
+- **10-year savings projection.** See what spending 10, 20, or 30% less each month would add up to over 10 years, at an assumed 5% yearly return.
 - **Export.** Download every expense as a CSV file for a spreadsheet.
 
 ## Run it
@@ -22,7 +23,7 @@ Requires Node.js 20 or later.
 ```bash
 npm install
 npm run dev        # http://localhost:5173
-npm test           # 49 tests
+npm test           # 54 tests
 npm run build      # typecheck, then production build to dist/
 npm run preview    # serve the production build locally
 ```

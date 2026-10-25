@@ -3,10 +3,11 @@ import { useState } from 'react';
 import type { ExpenseRepository } from './data/expenseRepository.js';
 import { toCsv } from './domain/csv.js';
 import type { Expense, NewExpense } from './domain/expense.js';
-import { expensesInMonth } from './domain/summary.js';
+import { expensesInMonth, totalCents } from './domain/summary.js';
 import { ExpenseForm } from './features/expenses/ExpenseForm.js';
 import { ExpenseList } from './features/expenses/ExpenseList.js';
 import { MonthSummary } from './features/expenses/MonthSummary.js';
+import { SavingsProjection } from './features/expenses/SavingsProjection.js';
 import { localIsoDate } from './features/expenses/format.js';
 
 export const DEFAULT_CURRENCY = 'USD';
@@ -32,6 +33,7 @@ function ExpenseScreen({ repository }: { repository: ExpenseRepository }) {
   const remove = useMutation({ mutationFn: (id: string) => repository.remove(id), onSuccess: refresh });
 
   const all = expenses.data ?? [];
+  const monthly = expensesInMonth(all, month);
 
   return (
     <div className="app">
@@ -41,7 +43,7 @@ function ExpenseScreen({ repository }: { repository: ExpenseRepository }) {
       </header>
 
       <main className="page">
-        <MonthSummary expenses={expensesInMonth(all, month)} currency={DEFAULT_CURRENCY} month={month} />
+        <MonthSummary expenses={monthly} currency={DEFAULT_CURRENCY} month={month} />
 
         <ExpenseForm today={today} defaultCurrency={DEFAULT_CURRENCY} onSave={(expense) => add.mutateAsync(expense)} />
 
@@ -56,6 +58,8 @@ function ExpenseScreen({ repository }: { repository: ExpenseRepository }) {
           {remove.isError ? <p role="alert" className="error">That expense could not be deleted.</p> : null}
           <ExpenseList expenses={all} today={today} onDelete={(id) => remove.mutate(id)} />
         </section>
+
+        {monthly.length > 0 ? <SavingsProjection monthlySpendCents={totalCents(monthly)} currency={DEFAULT_CURRENCY} /> : null}
       </main>
 
       <footer className="footer muted">

@@ -104,3 +104,10 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); ou
 .row__amount { font-weight: 700; font-variant-numeric: tabular-nums; }
 .icon-button { width: 36px; height: 36px; border-radius: 10px; border: 0; background: transparent; color: var(--muted); display: grid; place-items: center; }
 .icon-button:hover { color: var(--danger); background: var(--bg); }
+
+/* Savings projection */
+.projection { display: grid; gap: 10px; }
+.segmented { display: flex; gap: 6px; flex-wrap: wrap; }
+.segmented button { flex: 1; min-height: 36px; border-radius: 10px; border: 1px solid var(--border); background: transparent; font-size: 0.875rem; white-space: nowrap; }
+.segmented button[aria-pressed='true'] { background: var(--accent); color: var(--accent-text); border-color: transparent; }
+.projection__value { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; color: var(--ok); font-variant-numeric: tabular-nums; }
